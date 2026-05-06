@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Сервис рассылок{% endblock %}</title>
+
+    <!-- Простенький стиль через CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- 🔝 Навбар -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Mailing Service</a>
+
+            <div>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/recipient/">Клиенты</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/message/">Сообщения</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mailing/">Рассылка</a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <!-- 👤 Авторизация (пока заглушка) -->
+            <div class="text-light">
+                {% if user.is_authenticated %}
+                    {{ user.username }} | <a href="/logout/" class="text-light">Выход</a>
+                {% else %}
+                    <a href="/login/" class="text-light">Вход</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- 📦 Контент -->
+    <div class="container mt-4">
+
+        {% block content %}
+        <!-- сюда подставляется контент страниц -->
+        {% endblock %}
+
+    </div>
+
+    <!-- 🔻 Футер -->
+    <footer class="bg-light text-center mt-5 p-3">
+        <small>© 2026 Сервис рассылок</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Получатель{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <h2 class="card-title mb-4">
+            {{ object.full_name }}
+        </h2>
+
+        <p>
+            <strong>Email:</strong>
+            {{ object.email }}
+        </p>
+
+        <p>
+            <strong>Комментарий:</strong>
+            {{ object.comment }}
+        </p>
+
+        <a href="{% url 'mailing:recipient_update'  recipient.pk %}" class="btn btn-warning">
+            Редактировать
+        </a>
+
+        <a href="{% url 'mailing:recipient_delete'  recipient.pk %}" class="btn btn-danger">
+            Удалить
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

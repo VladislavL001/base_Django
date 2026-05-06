@@ -1,0 +1,65 @@
+{% extends 'mailing/base.html' %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-md-8">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body">
+
+                <h2 class="mb-4">
+                    {% if object %}
+                        Редактирование
+                    {% else %}
+                        Создание
+                    {% endif %}
+                </h2>
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+                    {% for field in form %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                {{ field.label }}
+                            </label>
+
+                            {{ field }}
+
+                            {% if field.errors %}
+
+                                <div class="text-danger mt-1">
+                                    {{ field.errors }}
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+                    {% endfor %}
+
+                    <button type="submit" class="btn btn-success">
+                        Сохранить
+                    </button>
+
+                    <a href="javascript:history.back()" class="btn btn-secondary">
+                        Назад
+                    </a>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

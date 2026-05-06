@@ -1,0 +1,140 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<div class="p-5 mb-4 bg-light rounded-3">
+    <div class="container-fluid py-3">
+        <h1 class="display-5 fw-bold">
+            Сервис управления рассылками
+        </h1>
+
+        <p class="col-md-8 fs-5">
+            Удобный сервис для создания, управления и отправки email-рассылок.
+            Добавляйте клиентов, создавайте сообщения и отслеживайте статистику отправок.
+        </p>
+
+        <a href="/mailing/" class="btn btn-primary btn-lg">
+            Перейти к рассылкам
+        </a>
+    </div>
+</div>
+
+<!-- 📊 Статистика -->
+<div class="row text-center">
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Всего рассылок
+                </h5>
+
+                <p class="display-4">
+                    {{ total_mailings }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Активных рассылок
+                </h5>
+
+                <p class="display-4 text-success">
+                    {{ active_mailings }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="card-title">
+                    Уникальных получателей
+                </h5>
+
+                <p class="display-4 text-primary">
+                    {{ unique_recipients }}
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 📬 Последние рассылки -->
+<div class="card shadow-sm mt-4">
+    <div class="card-header">
+        Последние рассылки
+    </div>
+
+    <div class="card-body">
+
+        {% if latest_mailings %}
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Сообщение</th>
+                        <th>Статус</th>
+                        <th>Дата начала</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for mailing in latest_mailings %}
+                        <tr>
+                            <td>{{ mailing.id }}</td>
+
+                            <td>
+                                {{ mailing.message.subject }}
+                            </td>
+
+                            <td>
+                                {% if mailing.status == 'created' %}
+                                    <span class="badge bg-secondary">
+                                        Создана
+                                    </span>
+
+                                {% elif mailing.status == 'started' %}
+                                    <span class="badge bg-success">
+                                        Запущена
+                                    </span>
+
+                                {% elif mailing.status == 'finished' %}
+                                    <span class="badge bg-dark">
+                                        Завершена
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ mailing.start_time }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <div class="alert alert-info mb-0">
+                Рассылок пока нет
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

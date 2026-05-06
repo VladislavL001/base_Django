@@ -1,0 +1,31 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}Сообщение{% endblock %}
+
+{% block content %}
+
+<div class="card shadow-sm">
+
+    <div class="card-body">
+
+        <h2 class="card-title mb-4">
+            {{ object.subject }}
+        </h2>
+
+        <p class="card-text">
+            {{ object.body }}
+        </p>
+
+        <a href="{% url 'mailing:message_update'  message.pk %}" class="btn btn-warning">
+            Редактировать
+        </a>
+
+        <a href="{% url 'mailing:message_delete'  message.pk %}" class="btn btn-danger">
+            Удалить
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}
