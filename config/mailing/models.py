@@ -24,9 +24,9 @@ class Mailing(models.Model):
     date_first = models.DateTimeField()
     date_last = models.DateTimeField()
 
-    CREATED = 'created'
-    RUNNING = 'running'
-    COMPLETED = 'completed'
+    CREATED = 'Created'
+    RUNNING = 'Running'
+    COMPLETED = 'Completed'
 
     status_list = [
         (COMPLETED, 'Завершена'),
