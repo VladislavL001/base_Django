@@ -56,7 +56,7 @@ class MailingSendView(LoginRequiredMixin, View):
 
         return redirect(
             'mailing:mailing_detail',
-            pk=pk
+            pk=mailing.pk
         )
 
 

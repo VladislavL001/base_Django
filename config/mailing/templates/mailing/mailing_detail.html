@@ -89,4 +89,38 @@
 
 </div>
 
+<h3>Попытки отправки</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Дата</th>
+            <th>Статус</th>
+            <th>Ответ сервера</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for attempt in mailing.attempts.all %}
+
+        <tr>
+            <td>{{ attempt.attempt_time }}</td>
+            <td>{{ attempt.get_status_display }}</td>
+            <td>{{ attempt.server_response }}</td>
+        </tr>
+
+    {% empty %}
+
+        <tr>
+            <td colspan="3">
+                Попыток ещё не было
+            </td>
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+</table>
+
 {% endblock %}

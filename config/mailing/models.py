@@ -92,5 +92,15 @@ class MailingAttempt(models.Model):
         null=True
     )
 
+    recipient = models.ForeignKey(
+        Recipient,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
+
+    class Meta:
+        ordering = ['-attempt_time']
+
     def __str__(self):
         return f'{self.mailing} - {self.status}'
