@@ -4,6 +4,7 @@ from .views import RecipientListView, RecipientDetailView,RecipientCreateView,Re
 from .views import MessageListView, MessageDetailView,MessageCreateView,MessageUpdateView, MessageDeleteView
 from .views import MailingListView, MailingDetailView,MailingCreateView,MailingUpdateView, MailingDeleteView
 from .apps import MailingConfig
+from .views import MailingSendView
 
 app_name = MailingConfig.name
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path("mailing/create/", MailingCreateView.as_view(), name="mailing_create"),
     path("mailing/<int:pk>/update/", MailingUpdateView.as_view(), name="mailing_update"),
     path("mailing/<int:pk>/delete/", MailingDeleteView.as_view(), name="mailing_delete"),
+
+    path("mailing/<int:pk>/send/", MailingSendView.as_view(), name="send_mailing"),
 ]

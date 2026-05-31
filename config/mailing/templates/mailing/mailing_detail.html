@@ -72,7 +72,8 @@
 
         </ul>
 
-        <a href="#" class="btn btn-success">
+        <a href="{% url 'mailing:send_mailing' mailing.pk %}"
+           class="btn btn-success">
             Запустить рассылку
         </a>
 

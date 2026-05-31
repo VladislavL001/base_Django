@@ -7,6 +7,10 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .forms import MessageForm, RecipientForm, MailingForm
 from .models import Message, Recipient, Mailing
+from .services import send_mailing
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect
+
 
 def main_view(request):
     return render(request, 'mailing/main.html')
@@ -25,6 +29,35 @@ class BaseUpdateView(LoginRequiredMixin, UpdateView):
 
 class BaseDeleteView(LoginRequiredMixin, DeleteView):
     pass
+
+from django.views import View
+
+class MailingSendView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+        mailing = get_object_or_404(
+            Mailing,
+            pk=pk
+        )
+
+        try:
+            send_mailing(mailing.pk)
+
+            messages.success(
+                request,
+                'Рассылка успешно отправлена'
+            )
+
+        except ValueError as e:
+            messages.error(
+                request,
+                str(e)
+            )
+
+        return redirect(
+            'mailing:mailing_detail',
+            pk=pk
+        )
 
 
 class RecipientListView(BaseListView):

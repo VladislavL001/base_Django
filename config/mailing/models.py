@@ -61,6 +61,36 @@ class Mailing(models.Model):
         return self.start_time <= time_now <= self.end_time
 
 
-
     def __str__(self):
         return f'Рассылка {self.id} - {self.message}'
+
+
+class MailingAttempt(models.Model):
+    SUCCESS = 'Success'
+    FAILED = 'Failed'
+
+    STATUS_CHOICES = [
+        (SUCCESS, 'Успешно'),
+        (FAILED, 'Не успешно'),
+    ]
+
+    mailing = models.ForeignKey(
+        Mailing,
+        on_delete=models.CASCADE,
+        related_name='attempts'
+    )
+
+    attempt_time = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES
+    )
+
+    server_response = models.TextField(
+        blank=True,
+        null=True
+    )
+
+    def __str__(self):
+        return f'{self.mailing} - {self.status}'
