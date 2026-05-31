@@ -1,4 +1,4 @@
-import datetime
+from django.utils import timezone
 
 from django.db import models
 from django.forms.fields import DateTimeField
@@ -21,8 +21,8 @@ class Message(models.Model):
         return self.subject
 
 class Mailing(models.Model):
-    date_first = models.DateTimeField()
-    date_last = models.DateTimeField()
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
     CREATED = 'Created'
     RUNNING = 'Running'
@@ -41,6 +41,26 @@ class Mailing(models.Model):
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     recipients = models.ManyToManyField(Recipient)
+
+
+    def update_status(self):
+        time_now = timezone.now()
+        if time_now < self.start_time:
+            new_status = self.CREATED
+        elif self.start_time <= time_now <= self.end_time:
+            new_status = self.RUNNING
+        else:
+            new_status = self.COMPLETED
+
+        if self.status != new_status:
+            self.status = new_status
+            self.save(update_fields=['status'])
+
+    def can_send(self):
+        time_now = timezone.now()
+        return self.start_time <= time_now <= self.end_time
+
+
 
     def __str__(self):
         return f'Рассылка {self.id} - {self.message}'
