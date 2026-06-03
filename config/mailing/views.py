@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.sites import requests
+from django.utils import timezone
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView
@@ -13,7 +13,30 @@ from django.shortcuts import get_object_or_404, redirect
 
 
 def main_view(request):
-    return render(request, 'mailing/main.html')
+
+    now = timezone.now()
+
+    total_mailings = Mailing.objects.count()
+
+    active_mailings = Mailing.objects.filter(
+        start_time__lte=now,
+        end_time__gte=now,
+        status=Mailing.RUNNING
+    ).count()
+
+    total_recipients = Recipient.objects.count()
+
+    context = {
+        'total_mailings': total_mailings,
+        'active_mailings': active_mailings,
+        'total_recipients': total_recipients,
+    }
+
+    return render(
+        request,
+        'mailing/main.html',
+        context
+    )
 
 class BaseListView(LoginRequiredMixin, ListView):
     pass
