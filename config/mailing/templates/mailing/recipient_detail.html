@@ -22,6 +22,7 @@
             {{ object.comment }}
         </p>
 
+        {% if recipient.owner == user or user.is_superuser %}
         <a href="{% url 'mailing:recipient_update'  recipient.pk %}" class="btn btn-warning">
             Редактировать
         </a>
@@ -29,6 +30,7 @@
         <a href="{% url 'mailing:recipient_delete'  recipient.pk %}" class="btn btn-danger">
             Удалить
         </a>
+        {% endif %}
 
     </div>
 

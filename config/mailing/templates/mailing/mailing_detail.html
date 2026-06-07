@@ -1,91 +1,30 @@
 {% extends 'mailing/base.html' %}
-
 {% block title %}Рассылка{% endblock %}
-
 {% block content %}
-
-<div class="card shadow-sm">
-
+<div class="card shadow-sm mb-4">
     <div class="card-body">
-
-        <h2 class="card-title mb-4">
-            Рассылка #{{ object.id }}
-        </h2>
-
-        <p>
-            <strong>Сообщение:</strong>
-            {{ object.message.subject }}
-        </p>
-
-        <p>
-            <strong>Дата начала:</strong>
-            {{ object.date_first }}
-        </p>
-
-        <p>
-            <strong>Дата окончания:</strong>
-            {{ object.date_last }}
-        </p>
-
-        <p>
-            <strong>Статус:</strong>
-
-            {% if object.status == 'Created' %}
-                <span class="badge bg-secondary">
-                    Создана
-                </span>
-
-            {% elif object.status == 'Running' %}
-                <span class="badge bg-success">
-                    Запущена
-                </span>
-
-            {% elif object.status == 'Completed' %}
-                <span class="badge bg-dark">
-                    Завершена
-                </span>
-
+        <h2>Рассылка №{{ mailing.pk }}</h2>
+        <p><strong>Сообщение:</strong> {{ mailing.message.subject }}</p>
+        <p><strong>Период:</strong> {{ mailing.start_time }} — {{ mailing.end_time }}</p>
+        <p><strong>Статус:</strong> {{ mailing.status }}</p>
+        <p><strong>Включена:</strong> {% if mailing.is_enabled %}Да{% else %}Нет{% endif %}</p>
+        <p><strong>Получатели:</strong></p>
+        <ul>{% for recipient in mailing.recipients.all %}<li>{{ recipient.full_name }} — {{ recipient.email }}</li>{% empty %}<li>Нет получателей</li>{% endfor %}</ul>
+        <div class="d-flex gap-2 flex-wrap">
+            {% if mailing.owner == user or user.is_superuser %}
+                <form method="post" action="{% url 'mailing:mailing_launch' mailing.pk %}">{% csrf_token %}<button class="btn btn-success">Запустить сейчас</button></form>
+                <a href="{% url 'mailing:mailing_update' mailing.pk %}" class="btn btn-warning">Редактировать</a>
+                <a href="{% url 'mailing:mailing_delete' mailing.pk %}" class="btn btn-danger">Удалить</a>
             {% endif %}
-        </p>
-
-        <hr>
-
-        <h5>
-            Получатели
-        </h5>
-
-        <ul class="list-group mb-4">
-
-            {% for recipient in object.recipients.all %}
-
-                <li class="list-group-item">
-                    {{ recipient.full_name }} — {{ recipient.email }}
-                </li>
-
-            {% empty %}
-
-                <li class="list-group-item">
-                    Получателей нет
-                </li>
-
-            {% endfor %}
-
-        </ul>
-
-        <a href="#" class="btn btn-success">
-            Запустить рассылку
-        </a>
-
-        <a href="{% url 'mailing:mailing_update'  mailing.pk %}" class="btn btn-warning">
-            Редактировать
-        </a>
-
-        <a href="{% url 'mailing:mailing_delete'  mailing.pk %}" class="btn btn-danger">
-            Удалить
-        </a>
-
+            {% if is_manager %}
+                <form method="post" action="{% url 'mailing:mailing_disable' mailing.pk %}">{% csrf_token %}<button class="btn btn-outline-danger">Отключить</button></form>
+            {% endif %}
+        </div>
     </div>
-
 </div>
-
+<h3>Последние попытки отправки</h3>
+<table class="table table-sm">
+    <thead><tr><th>Дата</th><th>Получатель</th><th>Статус</th><th>Ответ сервера</th></tr></thead>
+    <tbody>{% for attempt in attempts %}<tr><td>{{ attempt.attempt_time }}</td><td>{{ attempt.recipient.email|default:'—' }}</td><td>{{ attempt.status }}</td><td>{{ attempt.server_response }}</td></tr>{% empty %}<tr><td colspan="4">Попыток пока нет</td></tr>{% endfor %}</tbody>
+</table>
 {% endblock %}

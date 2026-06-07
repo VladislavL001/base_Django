@@ -2,65 +2,50 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Сервис рассылок{% endblock %}</title>
-
-    <!-- Простенький стиль через CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    {% block extra_css %}{% endblock %}
 </head>
 <body>
-
-    <!-- 🔝 Навбар -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="/">Mailing Service</a>
-
-            <div>
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/recipient/">Клиенты</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/message/">Сообщения</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="/mailing/">Рассылка</a>
-                    </li>
-
-                </ul>
-            </div>
-
-            <!-- 👤 Авторизация (пока заглушка) -->
-            <div class="text-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'mailing:main' %}">Mailing Service</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" href="{% url 'mailing:recipient_list' %}">Клиенты</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'mailing:message_list' %}">Сообщения</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'mailing:mailing_list' %}">Рассылки</a></li>
                 {% if user.is_authenticated %}
-                    {{ user.username }} | <a href="/logout/" class="text-light">Выход</a>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'mailing:statistics' %}">Статистика</a></li>
+                    {% if is_manager %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'users:user_list' %}">Пользователи</a></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
+            <div class="text-light d-flex gap-2 align-items-center">
+                {% if user.is_authenticated %}
+                    <span>{{ user.username }}</span>
+                    <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="btn btn-sm btn-outline-light">Выход</button></form>
                 {% else %}
-                    <a href="/login/" class="text-light">Вход</a>
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">Вход</a>
+                    <a href="{% url 'users:register' %}" class="btn btn-sm btn-primary">Регистрация</a>
                 {% endif %}
             </div>
         </div>
-    </nav>
-
-    <!-- 📦 Контент -->
-    <div class="container mt-4">
-
-        {% block content %}
-        <!-- сюда подставляется контент страниц -->
-        {% endblock %}
-
     </div>
-
-    <!-- 🔻 Футер -->
-    <footer class="bg-light text-center mt-5 p-3">
-        <small>© 2026 Сервис рассылок</small>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
-
+</nav>
+<main class="container mt-4">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+<footer class="bg-light text-center mt-5 p-3"><small>© 2026 Сервис рассылок</small></footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
