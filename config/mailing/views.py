@@ -11,6 +11,8 @@ from .services import send_mailing
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
+from django.contrib.auth.models import Group
+
 
 def main_view(request):
 
@@ -37,6 +39,9 @@ def main_view(request):
         'mailing/main.html',
         context
     )
+
+def is_manager(user):
+    return user.groups.filter(name='Менеджер').exists()
 
 class BaseListView(LoginRequiredMixin, ListView):
     pass
@@ -87,10 +92,25 @@ class RecipientListView(BaseListView):
     model = Recipient
     context_object_name = 'recipients'
 
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Recipient.objects.all()
+
+        return Recipient.objects.filter(
+            owner=self.request.user
+        )
 
 class RecipientDetailView(BaseDetailView):
     model = Recipient
     context_object_name = 'recipient'
+
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Recipient.objects.all()
+
+        return Recipient.objects.filter(
+            owner=self.request.user
+        )
 
 
 class RecipientCreateView(BaseCreateView):
@@ -99,6 +119,10 @@ class RecipientCreateView(BaseCreateView):
     template_name = 'mailing/form.html'
     success_url = reverse_lazy('mailing:recipient_list')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class RecipientUpdateView(BaseUpdateView):
     model = Recipient
@@ -106,11 +130,21 @@ class RecipientUpdateView(BaseUpdateView):
     template_name = 'mailing/form.html'
     success_url = reverse_lazy('mailing:recipient_list')
 
+    def get_queryset(self):
+        return Recipient.objects.filter(
+            owner=self.request.user
+        )
+
 
 class RecipientDeleteView(BaseDeleteView):
     model = Recipient
     template_name = 'mailing/confirm_delete.html'
     success_url = reverse_lazy('mailing:recipient_list')
+
+    def get_queryset(self):
+        return Recipient.objects.filter(
+            owner=self.request.user
+        )
 
 
 class MessageListView(BaseListView):
@@ -147,10 +181,31 @@ class MailingListView(BaseListView):
     model = Mailing
     context_object_name = 'mailing'
 
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Mailing.objects.all()
+
+        return Mailing.objects.filter(
+            owner=self.request.user
+        )
+
 
 class MailingDetailView(BaseDetailView):
     model = Mailing
     context_object_name = 'mailing'
+
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Mailing.objects.all()
+
+        return Mailing.objects.filter(
+            owner=self.request.user
+        )
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        obj.update_status()
+        return obj
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
@@ -164,6 +219,10 @@ class MailingCreateView(BaseCreateView):
     template_name = 'mailing/form.html'
     success_url = reverse_lazy('mailing:mailing_list')
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class MailingUpdateView(BaseUpdateView):
     model = Mailing
@@ -171,8 +230,18 @@ class MailingUpdateView(BaseUpdateView):
     template_name = 'mailing/form.html'
     success_url = reverse_lazy('mailing:mailing_list')
 
+    def get_queryset(self):
+        return Mailing.objects.filter(
+            owner=self.request.user
+        )
+
 
 class MailingDeleteView(BaseDeleteView):
     model = Mailing
     template_name = 'mailing/confirm_delete.html'
     success_url = reverse_lazy('mailing:mailing_list')
+
+    def get_queryset(self):
+        return Mailing.objects.filter(
+            owner=self.request.user
+        )

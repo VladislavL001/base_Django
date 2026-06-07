@@ -7,7 +7,7 @@ from .models import Message, Recipient, Mailing
 class RecipientForm(forms.ModelForm):
     class Meta:
         model = Recipient
-        fields = '__all__'
+        exclude = ['owner']
 
 class MessageForm(forms.ModelForm):
     class Meta:
@@ -17,7 +17,7 @@ class MessageForm(forms.ModelForm):
 class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
-        fields = '__all__'
+        exclude = ['owner']
 
     def clean(self):
         cleaned_data = super().clean()

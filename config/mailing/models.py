@@ -1,10 +1,17 @@
 from django.utils import timezone
-
+from django.conf import settings
 from django.db import models
 from django.forms.fields import DateTimeField
 
 
 class Recipient(models.Model):
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Владелец'
+    )
+
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255)
     comment = models.TextField(blank=True)
@@ -21,6 +28,12 @@ class Message(models.Model):
         return self.subject
 
 class Mailing(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        verbose_name='Владелец'
+    )
+
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 

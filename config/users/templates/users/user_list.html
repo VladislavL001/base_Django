@@ -1,0 +1,49 @@
+{% extends 'mailing/base.html' %}
+
+{% block title %}
+Пользователи
+{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Пользователи сервиса
+</h2>
+
+<table class="table table-striped">
+
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Логин</th>
+            <th>Email</th>
+            <th>Активен</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for user in users %}
+
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.username }}</td>
+            <td>{{ user.email }}</td>
+
+            <td>
+                {% if user.is_active %}
+                    Да
+                {% else %}
+                    Нет
+                {% endif %}
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}
