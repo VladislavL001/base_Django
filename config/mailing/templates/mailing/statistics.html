@@ -1,0 +1,15 @@
+{% extends 'mailing/base.html' %}
+{% block title %}Статистика{% endblock %}
+{% block content %}
+<h2>Статистика рассылок</h2>
+<div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card"><div class="card-body"><h6>Рассылок</h6><p class="display-6">{{ mailings_count }}</p></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><h6>Успешных попыток</h6><p class="display-6 text-success">{{ success_attempts }}</p></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><h6>Неуспешных попыток</h6><p class="display-6 text-danger">{{ failed_attempts }}</p></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><h6>Отправлено сообщений</h6><p class="display-6">{{ sent_messages }}</p></div></div></div>
+</div>
+<table class="table table-striped">
+    <thead><tr><th>Рассылка</th><th>Сообщение</th><th>Успешно</th><th>Не успешно</th></tr></thead>
+    <tbody>{% for mailing in mailing_stats %}<tr><td>№{{ mailing.pk }}</td><td>{{ mailing.message.subject }}</td><td>{{ mailing.success_count }}</td><td>{{ mailing.failure_count }}</td></tr>{% empty %}<tr><td colspan="4">Нет данных</td></tr>{% endfor %}</tbody>
+</table>
+{% endblock %}
