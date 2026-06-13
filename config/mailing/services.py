@@ -8,14 +8,10 @@ def send_mailing(mailing_id):
     mailing = Mailing.objects.get(pk=mailing_id)
 
     if not mailing.can_send():
-        raise ValueError(
-            'Рассылка недоступна для отправки'
-        )
+        raise ValueError("Рассылка недоступна для отправки")
 
     if not mailing.is_active:
-        raise ValueError(
-            'Рассылка отключена менеджером'
-        )
+        raise ValueError("Рассылка отключена менеджером")
 
     recipients = mailing.recipients.all()
 
@@ -33,13 +29,11 @@ def send_mailing(mailing_id):
             MailingAttempt.objects.create(
                 mailing=mailing,
                 status=MailingAttempt.SUCCESS,
-                server_response='Письмо отправлено'
+                server_response="Письмо отправлено",
             )
 
         except Exception as e:
 
             MailingAttempt.objects.create(
-                mailing=mailing,
-                status=MailingAttempt.FAILED,
-                server_response=str(e)
+                mailing=mailing, status=MailingAttempt.FAILED, server_response=str(e)
             )

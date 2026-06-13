@@ -1,15 +1,13 @@
-from django.utils import timezone
 from django.conf import settings
 from django.db import models
 from django.forms.fields import DateTimeField
+from django.utils import timezone
 
 
 class Recipient(models.Model):
 
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name='Владелец'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Владелец"
     )
 
     email = models.EmailField(unique=True)
@@ -21,45 +19,36 @@ class Recipient(models.Model):
 
 
 class Message(models.Model):
-    subject=models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
     body = models.TextField()
 
     def __str__(self):
         return self.subject
 
+
 class Mailing(models.Model):
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        verbose_name='Владелец'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Владелец"
     )
 
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
-    CREATED = 'Created'
-    RUNNING = 'Running'
-    COMPLETED = 'Completed'
+    CREATED = "Created"
+    RUNNING = "Running"
+    COMPLETED = "Completed"
 
     status_list = [
-        (COMPLETED, 'Завершена'),
-        (CREATED, 'Создана'),
-        (RUNNING, 'Запущена')
+        (COMPLETED, "Завершена"),
+        (CREATED, "Создана"),
+        (RUNNING, "Запущена"),
     ]
-    status = models.CharField(
-        max_length=20,
-        choices = status_list,
-        verbose_name= 'Статус'
-    )
-    
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name='Активна'
-    )
+    status = models.CharField(max_length=20, choices=status_list, verbose_name="Статус")
+
+    is_active = models.BooleanField(default=True, verbose_name="Активна")
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     recipients = models.ManyToManyField(Recipient)
-
 
     def update_status(self):
         time_now = timezone.now()
@@ -72,53 +61,41 @@ class Mailing(models.Model):
 
         if self.status != new_status:
             self.status = new_status
-            self.save(update_fields=['status'])
+            self.save(update_fields=["status"])
 
     def can_send(self):
         time_now = timezone.now()
         return self.start_time <= time_now <= self.end_time
 
-
     def __str__(self):
-        return f'Рассылка {self.id} - {self.message}'
+        return f"Рассылка {self.id} - {self.message}"
 
 
 class MailingAttempt(models.Model):
-    SUCCESS = 'Success'
-    FAILED = 'Failed'
+    SUCCESS = "Success"
+    FAILED = "Failed"
 
     STATUS_CHOICES = [
-        (SUCCESS, 'Успешно'),
-        (FAILED, 'Не успешно'),
+        (SUCCESS, "Успешно"),
+        (FAILED, "Не успешно"),
     ]
 
     mailing = models.ForeignKey(
-        Mailing,
-        on_delete=models.CASCADE,
-        related_name='attempts'
+        Mailing, on_delete=models.CASCADE, related_name="attempts"
     )
 
     attempt_time = models.DateTimeField(auto_now_add=True)
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
 
-    server_response = models.TextField(
-        blank=True,
-        null=True
-    )
+    server_response = models.TextField(blank=True, null=True)
 
     recipient = models.ForeignKey(
-        Recipient,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Recipient, on_delete=models.CASCADE, null=True, blank=True
     )
 
     class Meta:
-        ordering = ['-attempt_time']
+        ordering = ["-attempt_time"]
 
     def __str__(self):
-        return f'{self.mailing} - {self.status}'
+        return f"{self.mailing} - {self.status}"
