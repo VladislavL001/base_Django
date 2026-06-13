@@ -12,6 +12,11 @@ def send_mailing(mailing_id):
             'Рассылка недоступна для отправки'
         )
 
+    if not mailing.is_active:
+        raise ValueError(
+            'Рассылка отключена менеджером'
+        )
+
     recipients = mailing.recipients.all()
 
     for recipient in recipients:

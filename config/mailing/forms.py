@@ -17,7 +17,10 @@ class MessageForm(forms.ModelForm):
 class MailingForm(forms.ModelForm):
     class Meta:
         model = Mailing
-        exclude = ['owner']
+        exclude = [
+            'owner',
+            'is_active',
+        ]
 
     def clean(self):
         cleaned_data = super().clean()

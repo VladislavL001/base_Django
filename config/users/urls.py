@@ -6,9 +6,9 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetCompleteView,
 )
-from django.urls import path
+from django.urls import path, reverse_lazy
 
-from .views import RegisterView, UserListView
+from .views import RegisterView, UserListView, UserToggleActiveView
 
 app_name = 'users'
 
@@ -35,7 +35,9 @@ urlpatterns = [
     path(
         'password_reset/',
         PasswordResetView.as_view(
-            template_name='users/password_reset.html'
+            template_name='users/password_reset.html',
+            email_template_name='users/password_reset_email.html',
+            success_url=reverse_lazy('users:password_reset_done')
         ),
         name='password_reset'
     ),
@@ -64,4 +66,10 @@ urlpatterns = [
         name='password_reset_complete'
     ),
     path('', UserListView.as_view(), name='user_list'),
+
+    path(
+        'toggle/<int:pk>/',
+        UserToggleActiveView.as_view(),
+        name='toggle_active'
+    ),
 ]

@@ -31,15 +31,45 @@
                         <a class="nav-link" href="/mailing/">Рассылка</a>
                     </li>
 
+                    {% if user.groups.all %}
+
+                        {% for group in user.groups.all %}
+
+                            {% if group.name == 'Менеджер' %}
+                    
+                                <li class="nav-item">
+                                    <a class="nav-link"
+                                       href="{% url 'users:user_list' %}">
+                                        Пользователи
+                                    </a>
+                                </li>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% endif %}
+
                 </ul>
             </div>
 
-            <!-- 👤 Авторизация (пока заглушка) -->
             <div class="text-light">
                 {% if user.is_authenticated %}
-                    {{ user.username }} | <a href="/logout/" class="text-light">Выход</a>
+                    Привет, {{ user.username }} |
+                    <form method="post" action="{% url 'users:logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link text-light p-0">
+                            Выход
+                        </button>
+                    </form>
                 {% else %}
-                    <a href="/login/" class="text-light">Вход</a>
+                    <a href="{% url 'users:login' %}" class="text-light">
+                        Вход
+                    </a>
+                    |
+                    <a href="{% url 'users:register' %}" class="text-light">
+                        Регистрация
+                    </a>
                 {% endif %}
             </div>
         </div>

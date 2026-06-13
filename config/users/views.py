@@ -5,10 +5,38 @@ from .forms import UserRegisterForm
 from .models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView
 
+from django.views import View
+
 User = get_user_model()
+
+
+class UserToggleActiveView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+
+        if not request.user.groups.filter(
+            name='Менеджер'
+        ).exists():
+
+            return redirect('mailing:main')
+
+        user = get_object_or_404(
+            User,
+            pk=pk
+        )
+
+        user.is_active = not user.is_active
+
+        user.save(
+            update_fields=['is_active']
+        )
+
+        return redirect(
+            'users:user_list'
+        )
 
 
 class RegisterView(CreateView):

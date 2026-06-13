@@ -67,7 +67,58 @@
     </div>
 
 </div>
+<!-- 📈 Статистика отправок -->
+<div class="row text-center">
 
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    Успешных попыток
+                </h5>
+
+                <p class="display-4 text-success">
+                    {{ successful_attempts }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    Неуспешных попыток
+                </h5>
+
+                <p class="display-4 text-danger">
+                    {{ failed_attempts }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+
+                <h5 class="card-title">
+                    Отправлено сообщений
+                </h5>
+
+                <p class="display-4 text-primary">
+                    {{ sent_messages }}
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
 <!-- 📬 Последние рассылки -->
 <div class="card shadow-sm mt-4">
     <div class="card-header">

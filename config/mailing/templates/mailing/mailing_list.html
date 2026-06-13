@@ -92,6 +92,23 @@
                                 Запустить
                             </a>
 
+                            {% for group in user.groups.all %}
+                                {% if group.name == 'Менеджер' %}
+
+                                    <a href="{% url 'mailing:mailing_toggle' mailing.pk %}"
+                                       class="btn btn-sm btn-secondary">
+
+                                        {% if mailing.is_active %}
+                                            Отключить
+                                        {% else %}
+                                            Включить
+                                        {% endif %}
+
+                                    </a>
+
+                                {% endif %}
+                            {% endfor %}
+
                         </div>
 
                     </div>

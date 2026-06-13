@@ -18,6 +18,7 @@
             <th>Логин</th>
             <th>Email</th>
             <th>Активен</th>
+            <th>Действие</th>
         </tr>
     </thead>
 
@@ -25,20 +26,42 @@
 
     {% for user in users %}
 
-        <tr>
-            <td>{{ user.id }}</td>
-            <td>{{ user.username }}</td>
-            <td>{{ user.email }}</td>
+    <tr>
+    
+        <td>{{ user.id }}</td>
 
-            <td>
-                {% if user.is_active %}
-                    Да
-                {% else %}
-                    Нет
-                {% endif %}
-            </td>
+        <td>{{ user.username }}</td>
 
-        </tr>
+        <td>{{ user.email }}</td>
+
+        <td>
+            {% if user.is_active %}
+                Да
+            {% else %}
+                Нет
+            {% endif %}
+        </td>
+
+        <td>
+
+            {% if user != request.user %}
+
+                <a href="{% url 'users:toggle_active' user.pk %}"
+                   class="btn btn-sm btn-warning">
+
+                    {% if user.is_active %}
+                        Заблокировать
+                    {% else %}
+                        Разблокировать
+                    {% endif %}
+
+                </a>
+
+            {% endif %}
+
+        </td>
+
+    </tr>
 
     {% endfor %}
 

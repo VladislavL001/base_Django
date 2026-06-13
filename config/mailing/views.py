@@ -6,13 +6,17 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
 from .forms import MessageForm, RecipientForm, MailingForm
-from .models import Message, Recipient, Mailing
+from .models import Message, Recipient, Mailing, MailingAttempt
 from .services import send_mailing
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect
 
 from django.contrib.auth.models import Group
+from django.views import View
 
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
 
 def main_view(request):
 
@@ -28,11 +32,34 @@ def main_view(request):
 
     total_recipients = Recipient.objects.count()
 
-    context = {
-        'total_mailings': total_mailings,
-        'active_mailings': active_mailings,
-        'total_recipients': total_recipients,
-    }
+    successful_attempts = MailingAttempt.objects.filter(
+        status=MailingAttempt.SUCCESS
+    ).count()
+
+    failed_attempts = MailingAttempt.objects.filter(
+        status=MailingAttempt.FAILED
+    ).count()
+
+    sent_messages = successful_attempts
+
+    stats = cache.get('main_page_stats')
+    if not stats:
+        stats = {
+            'total_mailings': total_mailings,
+            'active_mailings': active_mailings,
+            'total_recipients': total_recipients,
+            'successful_attempts': successful_attempts,
+            'failed_attempts': failed_attempts,
+            'sent_messages': sent_messages,
+        }
+
+        cache.set(
+            'main_page_stats',
+            stats,
+            60 * 15
+        )
+
+    context = stats
 
     return render(
         request,
@@ -88,6 +115,29 @@ class MailingSendView(LoginRequiredMixin, View):
         )
 
 
+class MailingToggleActiveView(LoginRequiredMixin, View):
+
+    def get(self, request, pk):
+
+        if not is_manager(request.user):
+            return redirect('mailing:main')
+
+        mailing = get_object_or_404(
+            Mailing,
+            pk=pk
+        )
+
+        mailing.is_active = not mailing.is_active
+
+        mailing.save(
+            update_fields=['is_active']
+        )
+
+        return redirect(
+            'mailing:mailing_list'
+        )
+
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class RecipientListView(BaseListView):
     model = Recipient
     context_object_name = 'recipients'
@@ -177,6 +227,7 @@ class MessageDeleteView(BaseDeleteView):
     success_url = reverse_lazy('mailing:message_list')
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class MailingListView(BaseListView):
     model = Mailing
     context_object_name = 'mailing'

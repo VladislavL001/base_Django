@@ -51,6 +51,11 @@ class Mailing(models.Model):
         choices = status_list,
         verbose_name= 'Статус'
     )
+    
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активна'
+    )
 
     message = models.ForeignKey(Message, on_delete=models.CASCADE)
     recipients = models.ManyToManyField(Recipient)
