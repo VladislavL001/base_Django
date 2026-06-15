@@ -14,7 +14,7 @@ class RecipientForm(forms.ModelForm):
 class MessageForm(forms.ModelForm):
     class Meta:
         model = Message
-        fields = "__all__"
+        exclude = ["owner"]
 
 
 class MailingForm(forms.ModelForm):

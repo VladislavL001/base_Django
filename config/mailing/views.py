@@ -6,7 +6,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -115,7 +114,7 @@ class MailingToggleActiveView(LoginRequiredMixin, View):
         return redirect("mailing:mailing_list")
 
 
-@method_decorator(cache_page(60 * 15), name="dispatch")
+
 class RecipientListView(BaseListView):
     model = Recipient
     context_object_name = "recipients"
@@ -172,10 +171,26 @@ class MessageListView(BaseListView):
     model = Message
     context_object_name = "messages"
 
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Message.objects.all()
+
+        return Message.objects.filter(
+            owner=self.request.user
+        )
+
 
 class MessageDetailView(BaseDetailView):
     model = Message
     context_object_name = "message"
+
+    def get_queryset(self):
+        if is_manager(self.request.user):
+            return Message.objects.all()
+
+        return Message.objects.filter(
+            owner=self.request.user
+        )
 
 
 class MessageCreateView(BaseCreateView):
@@ -184,6 +199,10 @@ class MessageCreateView(BaseCreateView):
     template_name = "mailing/form.html"
     success_url = reverse_lazy("mailing:message_list")
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
 
 class MessageUpdateView(BaseUpdateView):
     model = Message
@@ -191,14 +210,24 @@ class MessageUpdateView(BaseUpdateView):
     template_name = "mailing/form.html"
     success_url = reverse_lazy("mailing:message_list")
 
+    def get_queryset(self):
+        return Message.objects.filter(
+            owner=self.request.user
+        )
+
 
 class MessageDeleteView(BaseDeleteView):
     model = Message
     template_name = "mailing/confirm_delete.html"
     success_url = reverse_lazy("mailing:message_list")
 
+    def get_queryset(self):
+        return Message.objects.filter(
+            owner=self.request.user
+        )
 
-@method_decorator(cache_page(60 * 15), name="dispatch")
+
+
 class MailingListView(BaseListView):
     model = Mailing
     context_object_name = "mailing"
@@ -219,11 +248,6 @@ class MailingDetailView(BaseDetailView):
             return Mailing.objects.all()
 
         return Mailing.objects.filter(owner=self.request.user)
-
-    def get_object(self, queryset=None):
-        obj = super().get_object(queryset)
-        obj.update_status()
-        return obj
 
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
