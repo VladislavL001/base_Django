@@ -8,7 +8,7 @@ from django.contrib.auth.views import (
 )
 from django.urls import path, reverse_lazy
 
-from .views import RegisterView, UserListView, UserToggleActiveView
+from .views import RegisterView, UserListView, UserToggleActiveView, VerifyEmailView
 
 app_name = "users"
 
@@ -43,6 +43,11 @@ urlpatterns = [
             template_name="users/password_reset_complete.html"
         ),
         name="password_reset_complete",
+    ),
+    path(
+        "verify/<uidb64>/<token>/",
+        VerifyEmailView.as_view(),
+        name="verify_email",
     ),
     path("", UserListView.as_view(), name="user_list"),
     path("toggle/<int:pk>/", UserToggleActiveView.as_view(), name="toggle_active"),
